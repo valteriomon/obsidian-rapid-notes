@@ -47,9 +47,9 @@ export default class RapidNotes extends Plugin {
             name: "New note",
             callback: async () => {
                 const prompt = new PromptModal("New note", "", false);
-                const originalNoteName: string = await new Promise((resolve, reject) => prompt.openAndGetValue(resolve, reject));
-                
-                if(originalNoteName) {
+                const originalNoteName: string = await new Promise((resolve) => prompt.openAndGetValue(resolve,()=>{}));
+
+                if( originalNoteName ) {
                     let saveTo = "", noteName;
                     const folders = this.getFoldersByPath();
     
@@ -57,21 +57,21 @@ export default class RapidNotes extends Plugin {
                     if (/^\/[^\s]/.test(originalNoteName)) {
                     noteName = originalNoteName.substring(1);
                     } else {
-                    const [prefix, noteNameNoPrefix] = originalNoteName.split(/(?<=^[\S]+)\s+/);
-    
-                    if (!(prefix in prefixedFolders) || !noteNameNoPrefix) {
-                        // No prefix or single word name
-                        noteName = originalNoteName;
-                    } else {
-                        noteName = noteNameNoPrefix;
-                        saveTo = prefixedFolders[prefix];
-                    }
+                        const [prefix, noteNameNoPrefix] = originalNoteName.split(/(?<=^[\S]+)\s+/);
+        
+                        if (!(prefix in prefixedFolders) || !noteNameNoPrefix) {
+                            // No prefix recognized or input is a single word
+                            noteName = originalNoteName;
+                        } else {
+                            noteName = noteNameNoPrefix;
+                            saveTo = prefixedFolders[prefix];
+                        }
                     }
     
                     if (!saveTo) {
                         const folderPaths = Object.keys(folders);
                         const suggester = new SuggesterModal(folderPaths, folderPaths, "");
-                        saveTo = await new Promise((resolve, reject) => suggester.openAndGetValue(resolve, reject));
+                        saveTo = await new Promise((resolve) => suggester.openAndGetValue(resolve, ()=>{}));
                         console.log(saveTo);
                     }
     
@@ -79,8 +79,7 @@ export default class RapidNotes extends Plugin {
                     app.workspace.getLeaf(false).openFile(newNote, {
                     state: { mode: "source" }
                     });
-    
-                }
+                }               
             }
         });
 
@@ -131,7 +130,7 @@ class RapidNotesSettingsTab extends PluginSettingTab {
 
         containerEl.empty();
 
-        containerEl.createEl('h2', {text: 'Rapid Notes Settings'});
+        containerEl.createEl('h2', {text: 'Rapid Notes settings'});
 
         new Setting(this.containerEl)
             .setName("Add new prefixes (single words, case sensitive) and assign them to folders.")
