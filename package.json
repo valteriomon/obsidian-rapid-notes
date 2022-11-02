@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "obsidian-rapid-notes",
 	"version": "1.0.1",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "Create and place notes quickly in specific folders based on predefined prefixes.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
