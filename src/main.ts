@@ -70,7 +70,7 @@ export default class RapidNotes extends Plugin {
     
                     if (!saveTo) {
                         const folderPaths = Object.keys(folders);
-                        const suggester = new SuggesterModal(folderPaths, folderPaths, "");
+                        const suggester = new SuggesterModal(folderPaths, folderPaths, "Choose folder");
                         saveTo = await new Promise((resolve) => suggester.openAndGetValue(resolve, ()=>{}));
                         console.log(saveTo);
                     }

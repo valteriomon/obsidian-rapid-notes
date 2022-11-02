@@ -41,4 +41,4 @@ If you have your `js` prefix set, but you wish to create a new file named `js ru
 
 ## Credits
 
-This plugin is a fork of [Obsdiain Sample Plugin](https://github.com/obsidianmd/obsidian-sample-plugin) and uses modules for prompts and suggesters are based on [Liam's Periodic Notes Plugin](https://github.com/liamcain/obsidian-periodic-notes) and [SilentVoid13's Templater Plugin](https://github.com/SilentVoid13/Templater). All the credits go to the original authors.
+This plugin is a fork of [Obsidian Sample Plugin](https://github.com/obsidianmd/obsidian-sample-plugin) and the modules used for prompts and suggesters are based on [Liam's Periodic Notes Plugin](https://github.com/liamcain/obsidian-periodic-notes) and [SilentVoid13's Templater Plugin](https://github.com/SilentVoid13/Templater). All the credits go to the original authors.
