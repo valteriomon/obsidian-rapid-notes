@@ -7,10 +7,10 @@ import {
     TFolder,
     Vault
 } from 'obsidian';
-import { FolderSuggest } from 'src/FolderSuggester';
-import { PromptModal } from 'src/PromptModal';
-import { SuggesterModal } from 'src/SuggesterModal';
-import { arraymove } from 'src/Utils';
+import { FolderSuggest } from './utils/FolderSuggester';
+import { PromptModal } from './utils/PromptModal';
+import { SuggesterModal } from './utils/SuggesterModal';
+import { arraymove } from './utils/Utils';
 
 // Remember to rename these classes and interfaces!
 
@@ -46,45 +46,41 @@ export default class RapidNotes extends Plugin {
             id: "new-prefixed-note",
             name: "New note",
             callback: async () => {
-                try {
-                    const prompt = new PromptModal("New note", "", false);
-                    const originalNoteName: string = await new Promise((resolve, reject) => prompt.openAndGetValue(resolve, reject));
-                    
-                    if(originalNoteName) {
-                      let saveTo: string = "", noteName;
-                      const folders = this.getFoldersByPath();
-      
-                      const prefixedFolders = this.getFoldersByPrefix(this.settings.prefixedFolders);
-                      if (/^\/[^\s]/.test(originalNoteName)) {
-                        noteName = originalNoteName.substring(1);
-                      } else {
-                        let [prefix, noteNameNoPrefix] = originalNoteName.split(/(?<=^[\S]+)\s+/);
-      
-                        if (!(prefix in prefixedFolders) || !noteNameNoPrefix) {
-                          // No prefix or single word name
-                          noteName = originalNoteName;
-                        } else {
-                          noteName = noteNameNoPrefix;
-                          saveTo = prefixedFolders[prefix];
-                        }
-                      }
-      
-                      if (!saveTo) {
-                          const folderPaths = Object.keys(folders);
-                          const suggester = new SuggesterModal(folderPaths, folderPaths, "");
-                          saveTo = await new Promise((resolve, reject) => suggester.openAndGetValue(resolve, reject));
-                          console.log(saveTo);
-                      }
-      
-                      const newNote = await app.fileManager.createNewMarkdownFile(folders[saveTo], noteName.trim());
-                      app.workspace.getLeaf(false).openFile(newNote, {
-                        state: { mode: "source" }
-                      });
-      
+                const prompt = new PromptModal("New note", "", false);
+                const originalNoteName: string = await new Promise((resolve, reject) => prompt.openAndGetValue(resolve, reject));
+                
+                if(originalNoteName) {
+                    let saveTo = "", noteName;
+                    const folders = this.getFoldersByPath();
+    
+                    const prefixedFolders = this.getFoldersByPrefix(this.settings.prefixedFolders);
+                    if (/^\/[^\s]/.test(originalNoteName)) {
+                    noteName = originalNoteName.substring(1);
+                    } else {
+                    const [prefix, noteNameNoPrefix] = originalNoteName.split(/(?<=^[\S]+)\s+/);
+    
+                    if (!(prefix in prefixedFolders) || !noteNameNoPrefix) {
+                        // No prefix or single word name
+                        noteName = originalNoteName;
+                    } else {
+                        noteName = noteNameNoPrefix;
+                        saveTo = prefixedFolders[prefix];
                     }
-                  } catch (error) {
-                    
-                  }
+                    }
+    
+                    if (!saveTo) {
+                        const folderPaths = Object.keys(folders);
+                        const suggester = new SuggesterModal(folderPaths, folderPaths, "");
+                        saveTo = await new Promise((resolve, reject) => suggester.openAndGetValue(resolve, reject));
+                        console.log(saveTo);
+                    }
+    
+                    const newNote = await app.fileManager.createNewMarkdownFile(folders[saveTo], noteName.trim());
+                    app.workspace.getLeaf(false).openFile(newNote, {
+                    state: { mode: "source" }
+                    });
+    
+                }
             }
         });
 
@@ -112,7 +108,7 @@ export default class RapidNotes extends Plugin {
     }
 
     getFolders(): TFolder[] {
-        let folders: Set<TFolder> = new Set();
+        const folders: Set<TFolder> = new Set();
         Vault.recurseChildren(app.vault.getRoot(), (file) => {
             if (file instanceof TFolder) {
                 folders.add(file);
@@ -138,7 +134,7 @@ class RapidNotesSettingsTab extends PluginSettingTab {
         containerEl.createEl('h2', {text: 'Rapid Notes Settings'});
 
         new Setting(this.containerEl)
-            .setName("Add new prefixes and assign them to folders.")
+            .setName("Add new prefixes (single words, case sensitive) and assign them to folders.")
             .addButton((button) => {
                 button
                 .setTooltip("Add additional prefix")
@@ -166,6 +162,14 @@ class RapidNotesSettingsTab extends PluginSettingTab {
                                 (e) => e.prefix == new_prefix
                             )) {
                             new Notice("Prefix already used!");
+                            return;
+                        } 
+                        
+                        if(
+                            new_prefix &&
+                            /\s/.test(new_prefix)
+                        ) {
+                            new Notice("Prefixes can't contain spaces!");
                             return;
                         }
                         this.plugin.settings.prefixedFolders[index].prefix = new_prefix;

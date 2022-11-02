@@ -1,11 +1,10 @@
 // Credits go to SilentVoid13's Templater Plugin: https://github.com/SilentVoid13/Templater
 
-import { RapidNotesError } from "./Error";
 import { FuzzyMatch, FuzzySuggestModal } from "obsidian";
 
 export class SuggesterModal<T> extends FuzzySuggestModal<T> {
     private resolve: (value: T) => void;
-    private reject: (reason?: RapidNotesError) => void;
+    private reject: () => void;
     private submitted = false;
 
     constructor(
@@ -25,7 +24,7 @@ export class SuggesterModal<T> extends FuzzySuggestModal<T> {
 
     onClose(): void {
         if (!this.submitted) {
-            this.reject(new RapidNotesError("Cancelled prompt"));
+            this.reject();
         }
     }
 
@@ -53,7 +52,7 @@ export class SuggesterModal<T> extends FuzzySuggestModal<T> {
 
     async openAndGetValue(
         resolve: (value: T) => void,
-        reject: (reason?: RapidNotesError) => void
+        reject: () => void
     ): Promise<void> {
         this.resolve = resolve;
         this.reject = reject;

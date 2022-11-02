@@ -1,6 +1,5 @@
 // Credits go to SilentVoid13's Templater Plugin: https://github.com/SilentVoid13/Templater
 
-import { RapidNotesError } from "./Error";
 import {
     ButtonComponent,
     Modal,
@@ -11,7 +10,7 @@ import {
 
 export class PromptModal extends Modal {
     private resolve: (value: string) => void;
-    private reject: (reason?: RapidNotesError) => void;
+    private reject: () => void;
     private submitted = false;
     private value: string;
 
@@ -31,8 +30,7 @@ export class PromptModal extends Modal {
     onClose(): void {
         this.contentEl.empty();
         if (!this.submitted) {
-            // TOFIX: for some reason throwing RapidNotesError on iOS causes the app to freeze.
-            // this.reject(new RapidNotesError("Cancelled prompt"));
+            // TOFIX: for some reason throwing Error on iOS causes the app to freeze.
             this.reject();
         }
     }
@@ -96,7 +94,7 @@ export class PromptModal extends Modal {
 
     async openAndGetValue(
         resolve: (value: string) => void,
-        reject: (reason?: RapidNotesError) => void
+        reject: () => void
     ): Promise<void> {
         this.resolve = resolve;
         this.reject = reject;
