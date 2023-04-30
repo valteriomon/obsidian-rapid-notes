@@ -15,10 +15,10 @@ import { SuggesterModal } from './utils/SuggesterModal';
 import { arraymove } from './utils/Utils';
 
 export enum NotePlacement {
-    SameTab,
-    NewTab = "tab",
-    NewPane = "split",
-    NewWindow = "window"
+    sameTab,
+    newTab = "tab",
+    newPane = "split",
+    newWindow = "window"
 }
 export interface PrefixFolderTuple {
     prefix: string;
@@ -38,6 +38,7 @@ export interface FoldersByPrefix {
 export interface RapidNotesSettings {
     prefixedFolders: Array<PrefixFolderTuple>;
     forceFileCreation: boolean;
+    escapeSymbol: string;
 }
 
 const DEFAULT_SETTINGS = {
@@ -53,29 +54,29 @@ export default class RapidNotes extends Plugin {
 
         this.addCommands(this);
 
-        // this.app.vault.on("rename", (file, oldPath) => {
-		// 	const oldItemIndex = this.settings.files.findIndex(item => item === oldPath);
-		// 	if (oldItemIndex >= 0) {
-		// 		this.settings.files.splice(oldItemIndex, 1, file.path);
-		// 		this.saveSettings();
-		// 		const id = this.manifest.id + ":" + oldPath;
-		// 		(this.app as any).commands.removeCommand(id);
-		// 		const hotkeys = (this.app as any).hotkeyManager.getHotkeys(id);
-		// 		this.setCommands(this);
-		// 		if (hotkeys) {
-		// 			(this.app as any).hotkeyManager.setHotkeys(this.manifest.id + ":" + file.path, hotkeys);
-		// 		}
-		// 	};
-		// });
-		// this.app.vault.on("delete", file => {
-		// 	const oldItemIndex = this.settings.files.findIndex(item => item === file.path);
-		// 	if (oldItemIndex >= 0) {
-		// 		this.settings.files.splice(oldItemIndex, 1,);
-		// 		this.saveSettings();
-		// 		const id = this.manifest.id + ":" + file.path;
-		// 		(this.app as any).commands.removeCommand(id);
-		// 	};
-		// });
+        this.app.vault.on("rename", (file, oldPath) => {
+            const oldItemIndex = this.settings.prefixedFolders.findIndex(prefixedFolder => prefixedFolder.folder === oldPath);
+            if (oldItemIndex >= 0) {
+                new Notice(`Rapid notes: ${oldPath} was being used as a prefixed folder, path was updated.`);
+                this.settings.prefixedFolders[oldItemIndex].folder = file.path;
+                if(this.settings.prefixedFolders[oldItemIndex].addCommand) {
+                    new Notice(`Rapid notes: Custom command needs an Obsidian relaunch to work properly.`);
+                }
+                this.saveSettings();
+            };
+        });
+
+        this.app.vault.on("delete", file => {
+            const oldItemIndex = this.settings.prefixedFolders.findIndex(prefixedFolder => prefixedFolder.folder === file.path);
+            if (oldItemIndex >= 0) {
+                new Notice(`Rapid notes: ${file.path} was being used as a prefixed folder. The entry will no longer work, remove or update manually.`);
+                if(this.settings.prefixedFolders[oldItemIndex].addCommand) {
+                    this.settings.prefixedFolders[oldItemIndex].addCommand = false;
+                    new Notice(`Rapid notes: Custom command will be removed after Obsidian relaunches.`);
+                }
+                this.saveSettings();
+            };
+        });
 
         this.addSettingTab(new RapidNotesSettingsTab(this.app, this));
     }
@@ -101,7 +102,7 @@ export default class RapidNotes extends Plugin {
                 const promptValue = await this.promptNewNote();
                 if(promptValue) {
                     const { folderPath, filename } = await this.parseNoteName(promptValue);
-                    this.openNote(folderPath, filename, NotePlacement.SameTab);
+                    this.openNote(folderPath, filename, NotePlacement.sameTab);
                 }
             }
         });
@@ -113,7 +114,7 @@ export default class RapidNotes extends Plugin {
                 const promptValue = await this.promptNewNote();
                 if(promptValue) {
                     const { folderPath, filename } = await this.parseNoteName(promptValue);
-                    this.openNote(folderPath, filename, NotePlacement.NewTab);
+                    this.openNote(folderPath, filename, NotePlacement.newTab);
                 }
             }
         });
@@ -125,7 +126,7 @@ export default class RapidNotes extends Plugin {
                 const promptValue = await this.promptNewNote();
                 if(promptValue) {
                     const { folderPath, filename } = await this.parseNoteName(promptValue);
-                    this.openNote(folderPath, filename, NotePlacement.NewPane);
+                    this.openNote(folderPath, filename, NotePlacement.newPane);
                 }
             }
         });
@@ -137,52 +138,48 @@ export default class RapidNotes extends Plugin {
                 const promptValue = await this.promptNewNote();
                 if(promptValue) {
                     const { folderPath, filename } = await this.parseNoteName(promptValue);
-                    this.openNote(folderPath, filename, NotePlacement.NewWindow);
+                    this.openNote(folderPath, filename, NotePlacement.newWindow);
                 }
             }
         });
 
         plugin.settings.prefixedFolders.forEach((prefixedFolder) => {
             if(prefixedFolder.addCommand){
-
                 plugin.addCommand({
                     id: "new-note-in-" + prefixedFolder.folder,
                     name: "Create new note in " + prefixedFolder.folder,
                     callback: async () => {
                         const promptValue = await this.promptNewNote();
-                        this.openNote(prefixedFolder.folder, promptValue, NotePlacement.SameTab);
+                        this.openNote(prefixedFolder.folder, promptValue, NotePlacement.sameTab);
                     }
                 });
-
                 plugin.addCommand({
                     id: "new-note-in-" + prefixedFolder.folder + "-new-tab",
                     name: "Create new note in " + prefixedFolder.folder + " and open in new tab",
                     callback: async () => {
                         const promptValue = await this.promptNewNote();
-                        this.openNote(prefixedFolder.folder, promptValue, NotePlacement.NewTab);
+                        this.openNote(prefixedFolder.folder, promptValue, NotePlacement.newTab);
                     }
                 });
-
                 plugin.addCommand({
                     id: "new-note-in-" + prefixedFolder.folder + "-new-pane",
                     name: "Create new note in " + prefixedFolder.folder + " and open in new pane",
                     callback: async () => {
                         const promptValue = await this.promptNewNote();
-                        this.openNote(prefixedFolder.folder, promptValue, NotePlacement.NewPane);
+                        this.openNote(prefixedFolder.folder, promptValue, NotePlacement.newPane);
                     }
                 });
-
                 plugin.addCommand({
                     id: "new-note-in-" + prefixedFolder.folder + "-new-window",
                     name: "Create new note in " + prefixedFolder.folder + " and open in new window",
                     callback: async () => {
                         const promptValue = await this.promptNewNote();
-                        this.openNote(prefixedFolder.folder, promptValue, NotePlacement.NewWindow);
+                        this.openNote(prefixedFolder.folder, promptValue, NotePlacement.newWindow);
                     }
                 });
             }
         });
-	}
+    }
 
     async promptNewNote() {
         const prompt = new PromptModal("New note", "", false);
@@ -193,7 +190,8 @@ export default class RapidNotes extends Plugin {
     async parseNoteName(filename: string) {
         const prefixedFolders = this.getFoldersByPrefix(this.settings.prefixedFolders);
         let folderPath = "";
-        if (/^\/[^\s]/.test(filename)) {
+        const escapeSymbol = this.settings.escapeSymbol || "/";
+        if (filename.charAt(0) === escapeSymbol) {
             // Prompt value is escaped, no prefix check needed
             filename = filename.substring(1);
         } else {
@@ -282,141 +280,128 @@ class RapidNotesSettingsTab extends PluginSettingTab {
         containerEl.empty();
         containerEl.createEl('h2', {text: 'Rapid Notes settings'});
 
-        // new Setting(this.containerEl)
-        //     .setName("Choose where to open newly created notes")
-        //     .addDropdown((dropdown) => {
-		// 		dropdown
-        //         .addOption(NotePlacement[NotePlacement.SameTab], 'Same tab')
-        //         .addOption(NotePlacement[NotePlacement.NewTab], 'New tab')
-        //         .addOption(NotePlacement[NotePlacement.NewPane], 'New pane')
-        //         .setValue(NotePlacement[this.plugin.settings.notePlacement] || NotePlacement.SameTab.toString())
-        //         .onChange((notePlacement: string) => {
-        //             this.plugin.settings.notePlacement = NotePlacement[notePlacement as keyof typeof NotePlacement];;
-        //             this.plugin.saveSettings();
-        //             this.display();
-        //         })
-        //     });
-
-
         new Setting(this.containerEl)
-            .setName("Force file creation adding a number at the end if the folder/filename is already in use (default behavior will open the existing file)")
-            .addToggle((toggle) => {
-                toggle
-                .setValue(this.plugin.settings.forceFileCreation)
-                .onChange((forceFileCreation) => {
-                    this.plugin.settings.forceFileCreation = forceFileCreation;
-                    this.plugin.saveSettings();
-                    this.display();
-                });
+        .setName("Force file creation adding a number at the end if the folder/filename is already in use. Default behavior will open the existing file.")
+        .addToggle((toggle) => {
+            toggle
+            .setValue(this.plugin.settings.forceFileCreation)
+            .onChange((forceFileCreation) => {
+                this.plugin.settings.forceFileCreation = forceFileCreation;
+                this.plugin.saveSettings();
+                this.display();
+            });
         });
 
         new Setting(this.containerEl)
-            .setName("Add new prefixes (single words, case sensitive) and assign them to folders.")
-            .setDesc("Toggle available for adding a command to save directly into the folder instead of using the prefix.")
-            .addButton((button) => {
-                button
-                .setTooltip("Add additional prefix")
-                .setButtonText("+")
-                .setCta()
+        .setName("Escape symbol to avoid checking the prefix and moving the note.")
+        .addText((cb) => {
+            cb
+            .setPlaceholder("/")
+            .setValue(this.plugin.settings.escapeSymbol)
+            .onChange((escapeSymbol) => {
+                this.plugin.settings.escapeSymbol = escapeSymbol;
+                this.plugin.saveSettings();
+                this.display();
+            });
+        });
+
+        new Setting(this.containerEl)
+        .setName("Add new prefixes (single words, case sensitive) or shortcuts and assign them to folders.")
+        .setDesc("Toggle available for adding a command to save directly into the folder. Relaunch the Obsidian or disable/enable the plugin for changes to take effect, either adding or removing a command,")
+        .addButton((button) => {
+            button
+            .setTooltip("Add additional prefix")
+            .setButtonText("+")
+            .setCta()
+            .onClick(() => {
+                this.plugin.settings.prefixedFolders.push({
+                    folder: "",
+                    prefix: "",
+                    filenamePrefix: "",
+                    addCommand: false
+                });
+                this.plugin.saveSettings();
+                this.display();
+            });
+        });
+
+        this.plugin.settings.prefixedFolders.forEach((prefixedFolder, index) => {
+            const s = new Setting(this.containerEl)
+            .addText((cb) => {
+                cb
+                .setPlaceholder("Prefix")
+                .setValue(prefixedFolder.prefix)
+                .onChange((newPrefix) => {
+                    if (newPrefix && this.plugin.settings.prefixedFolders.some((e) => e.prefix == newPrefix)) {
+                        new Notice("Prefix already used!");
+                        return;
+                    }
+
+                    if(newPrefix && /\s/.test(newPrefix)) {
+                        new Notice("Prefixes can't contain spaces!");
+                        return;
+                    }
+                    this.plugin.settings.prefixedFolders[index].prefix = newPrefix;
+                    this.plugin.saveSettings();
+                });
+            })
+            .addText((cb) => {
+                cb
+                .setPlaceholder("Optional note prefix")
+                .setValue(prefixedFolder.filenamePrefix).onChange((newNotePrefix) => {
+                    this.plugin.settings.prefixedFolders[index].filenamePrefix = newNotePrefix.trim();
+                    this.plugin.saveSettings();
+                });
+            })
+            .addSearch((cb) => {
+                new FolderSuggest(cb.inputEl);
+                cb
+                .setPlaceholder("Folder")
+                .setValue(prefixedFolder.folder)
+                .onChange((newFolder) => {
+                    if (newFolder && this.plugin.settings.prefixedFolders.some((e) => e.folder == newFolder)) {
+                        new Notice("This folder already has a prefix associated with it.");
+                        return;
+                    }
+                    this.plugin.settings.prefixedFolders[index].folder = newFolder;
+                    this.plugin.saveSettings();
+                });
+                cb.containerEl.addClass("rapid-notes_search");
+            })
+            .addToggle((toggle) => {
+                toggle
+                .setValue(this.plugin.settings.prefixedFolders[index].addCommand)
+                .onChange((addCommand) => {
+                    this.plugin.settings.prefixedFolders[index].addCommand = addCommand;
+                    this.plugin.saveSettings();
+                    this.display();
+                });
+            })
+            .addExtraButton((cb) => {
+                cb
+                .setIcon("up-chevron-glyph")
+                .setTooltip("Move up")
                 .onClick(() => {
-                    this.plugin.settings.prefixedFolders.push({
-                        folder: "",
-                        prefix: "",
-                        filenamePrefix: "",
-                        addCommand: false
-                    });
+                    arraymove(this.plugin.settings.prefixedFolders, index, index - 1);
+                    this.plugin.saveSettings();
+                    this.display();
+                });
+            })
+            .addExtraButton((cb) => {
+                cb.setIcon("down-chevron-glyph").setTooltip("Move down").onClick(() => {
+                    arraymove(this.plugin.settings.prefixedFolders, index, index + 1);
+                    this.plugin.saveSettings();
+                    this.display();
+                });
+            })
+            .addExtraButton((cb) => {
+                cb.setIcon("cross").setTooltip("Delete").onClick(() => {
+                    this.plugin.settings.prefixedFolders.splice(index, 1);
                     this.plugin.saveSettings();
                     this.display();
                 });
             });
-
-        this.plugin.settings.prefixedFolders.forEach((prefixedFolder, index) => {
-            const s = new Setting(this.containerEl)
-                .addText((cb) => {
-                    cb
-                    .setPlaceholder("Prefix")
-                    .setValue(prefixedFolder.prefix).onChange((newPrefix) => {
-                        if (
-                            newPrefix &&
-                            this.plugin.settings.prefixedFolders.some(
-                                (e) => e.prefix == newPrefix
-                            )) {
-                            new Notice("Prefix already used!");
-                            return;
-                        }
-
-                        if(
-                            newPrefix &&
-                            /\s/.test(newPrefix)
-                        ) {
-                            new Notice("Prefixes can't contain spaces!");
-                            return;
-                        }
-                        this.plugin.settings.prefixedFolders[index].prefix = newPrefix;
-                        this.plugin.saveSettings();
-                    });
-                })
-                .addText((cb) => {
-                    cb
-                    .setPlaceholder("Optional note prefix")
-                    .setValue(prefixedFolder.filenamePrefix).onChange((newNotePrefix) => {
-                        this.plugin.settings.prefixedFolders[index].filenamePrefix = newNotePrefix.trim();
-                        this.plugin.saveSettings();
-                    });
-                })
-                .addSearch((cb) => {
-                    new FolderSuggest(cb.inputEl);
-                    cb
-                    .setPlaceholder("Folder")
-                    .setValue(prefixedFolder.folder)
-                    .onChange((newFolder) => {
-                        if (
-                            newFolder &&
-                            this.plugin.settings.prefixedFolders.some(
-                                (e) => e.folder == newFolder
-                            )) {
-                                new Notice("This folder already has a prefix associated with it.");
-                                return;
-                            }
-                            this.plugin.settings.prefixedFolders[index].folder = newFolder;
-                            this.plugin.saveSettings();
-                    });
-                    cb.containerEl.addClass("rapid-notes_search");
-                })
-                .addToggle((toggle) => {
-                    toggle
-                    .setValue(this.plugin.settings.prefixedFolders[index].addCommand)
-                    .onChange((addCommand) => {
-                        this.plugin.settings.prefixedFolders[index].addCommand = addCommand;
-                        this.plugin.saveSettings();
-                        this.display();
-                    });
-                })
-                .addExtraButton((cb) => {
-                    cb
-                    .setIcon("up-chevron-glyph")
-                    .setTooltip("Move up")
-                    .onClick(() => {
-                        arraymove(this.plugin.settings.prefixedFolders, index, index - 1);
-                        this.plugin.saveSettings();
-                        this.display();
-                    });
-                })
-                .addExtraButton((cb) => {
-                    cb.setIcon("down-chevron-glyph").setTooltip("Move down").onClick(() => {
-                        arraymove(this.plugin.settings.prefixedFolders, index, index + 1);
-                        this.plugin.saveSettings();
-                        this.display();
-                    });
-                })
-                .addExtraButton((cb) => {
-                    cb.setIcon("cross").setTooltip("Delete").onClick(() => {
-                        this.plugin.settings.prefixedFolders.splice(index, 1);
-                        this.plugin.saveSettings();
-                        this.display();
-                    });
-                });
-                s.infoEl.remove();
+            s.infoEl.remove();
         });
     }
 }
