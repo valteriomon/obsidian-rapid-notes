@@ -96,7 +96,6 @@ export default class RapidNotes extends Plugin {
     }
 
     addCommands(plugin: RapidNotes) {
-
         plugin.addCommand({
             id: "new-prefixed-note",
             name: "New note in current tab",
@@ -108,7 +107,6 @@ export default class RapidNotes extends Plugin {
                 }
             }
         });
-
         plugin.addCommand({
             id: "new-prefixed-note-new-tab",
             name: "New note in new tab",
@@ -120,7 +118,6 @@ export default class RapidNotes extends Plugin {
                 }
             }
         });
-
         plugin.addCommand({
             id: "new-prefixed-note-new-background-tab",
             name: "New note in background tab",
@@ -132,7 +129,6 @@ export default class RapidNotes extends Plugin {
                 }
             }
         });
-
         plugin.addCommand({
             id: "new-prefixed-note-new-pane",
             name: "New note in new pane",
@@ -144,7 +140,6 @@ export default class RapidNotes extends Plugin {
                 }
             }
         });
-
         plugin.addCommand({
             id: "new-prefixed-note-new-window",
             name: "New note in new window",
@@ -156,7 +151,6 @@ export default class RapidNotes extends Plugin {
                 }
             }
         });
-
         plugin.settings.prefixedFolders.forEach((prefixedFolder) => {
             if(prefixedFolder.addCommand){
                 plugin.addCommand({
