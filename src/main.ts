@@ -59,10 +59,10 @@ export default class RapidNotes extends Plugin {
         this.app.vault.on("rename", (file, oldPath) => {
             const oldItemIndex = this.settings.prefixedFolders.findIndex(prefixedFolder => prefixedFolder.folder === oldPath);
             if (oldItemIndex >= 0) {
-                new Notice(`Rapid notes: ${oldPath} was being used as a prefixed folder, path was updated.`);
                 this.settings.prefixedFolders[oldItemIndex].folder = file.path;
+                new Notice(`Rapid notes: ${oldPath} was being used as a prefixed folder, path was updated.`);
                 if(this.settings.prefixedFolders[oldItemIndex].addCommand) {
-                    new Notice(`Rapid notes: Custom command needs an Obsidian relaunch to work properly.`);
+                    new Notice(`Rapid notes: The custom command needs an Obsidian relaunch to work properly.`);
                 }
                 this.saveSettings();
             };
@@ -74,7 +74,7 @@ export default class RapidNotes extends Plugin {
                 new Notice(`Rapid notes: ${file.path} was being used as a prefixed folder. The entry will no longer work, remove or update manually.`);
                 if(this.settings.prefixedFolders[oldItemIndex].addCommand) {
                     this.settings.prefixedFolders[oldItemIndex].addCommand = false;
-                    new Notice(`Rapid notes: Custom command will be removed after Obsidian relaunches.`);
+                    new Notice(`Rapid notes: The custom command will be removed after Obsidian relaunches.`);
                 }
                 this.saveSettings();
             };
