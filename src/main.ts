@@ -7,7 +7,9 @@ import {
     TFile,
     TFolder,
     Vault,
-    normalizePath
+    normalizePath,
+    Editor,
+    EditorPosition
 } from 'obsidian';
 import { FolderSuggest } from './utils/FolderSuggester';
 import { PromptModal } from './utils/PromptModal';
@@ -101,7 +103,7 @@ export default class RapidNotes extends Plugin {
             callback: async () => {
                 const promptValue = await this.promptNewNote();
                 if(promptValue) {
-                    const { folderPath, filename } = await this.parseNoteName(promptValue);
+                    const { folderPath, filename } = await this.parseFilename(promptValue);
                     this.openNote(folderPath, filename, NotePlacement.sameTab);
                 }
             }
@@ -113,8 +115,20 @@ export default class RapidNotes extends Plugin {
             callback: async () => {
                 const promptValue = await this.promptNewNote();
                 if(promptValue) {
-                    const { folderPath, filename } = await this.parseNoteName(promptValue);
+                    const { folderPath, filename } = await this.parseFilename(promptValue);
                     this.openNote(folderPath, filename, NotePlacement.newTab);
+                }
+            }
+        });
+
+        plugin.addCommand({
+            id: "new-prefixed-note-new-background-tab",
+            name: "New note in background tab",
+            callback: async () => {
+                const promptValue = await this.promptNewNote();
+                if(promptValue) {
+                    const { folderPath, filename } = await this.parseFilename(promptValue);
+                    this.openNote(folderPath, filename, NotePlacement.newTab, false);
                 }
             }
         });
@@ -125,7 +139,7 @@ export default class RapidNotes extends Plugin {
             callback: async () => {
                 const promptValue = await this.promptNewNote();
                 if(promptValue) {
-                    const { folderPath, filename } = await this.parseNoteName(promptValue);
+                    const { folderPath, filename } = await this.parseFilename(promptValue);
                     this.openNote(folderPath, filename, NotePlacement.newPane);
                 }
             }
@@ -137,7 +151,7 @@ export default class RapidNotes extends Plugin {
             callback: async () => {
                 const promptValue = await this.promptNewNote();
                 if(promptValue) {
-                    const { folderPath, filename } = await this.parseNoteName(promptValue);
+                    const { folderPath, filename } = await this.parseFilename(promptValue);
                     this.openNote(folderPath, filename, NotePlacement.newWindow);
                 }
             }
@@ -146,38 +160,75 @@ export default class RapidNotes extends Plugin {
         plugin.settings.prefixedFolders.forEach((prefixedFolder) => {
             if(prefixedFolder.addCommand){
                 plugin.addCommand({
-                    id: "new-note-in-" + prefixedFolder.folder,
-                    name: "Create new note in " + prefixedFolder.folder,
+                    id: "new-prefixed-note-in-" + prefixedFolder.folder,
+                    name: "New note in " + prefixedFolder.folder,
                     callback: async () => {
                         const promptValue = await this.promptNewNote();
                         this.openNote(prefixedFolder.folder, promptValue, NotePlacement.sameTab);
                     }
                 });
                 plugin.addCommand({
-                    id: "new-note-in-" + prefixedFolder.folder + "-new-tab",
-                    name: "Create new note in " + prefixedFolder.folder + " and open in new tab",
+                    id: "new-prefixed-note-in-" + prefixedFolder.folder + "-new-tab",
+                    name: "New note in " + prefixedFolder.folder + "(open in new tab)",
                     callback: async () => {
                         const promptValue = await this.promptNewNote();
                         this.openNote(prefixedFolder.folder, promptValue, NotePlacement.newTab);
                     }
                 });
                 plugin.addCommand({
-                    id: "new-note-in-" + prefixedFolder.folder + "-new-pane",
-                    name: "Create new note in " + prefixedFolder.folder + " and open in new pane",
+                    id: "new-prefixed-note-in-" + prefixedFolder.folder + "-new-background-tab",
+                    name: "New note in " + prefixedFolder.folder + "(open in new background tab)",
+                    callback: async () => {
+                        const promptValue = await this.promptNewNote();
+                        this.openNote(prefixedFolder.folder, promptValue, NotePlacement.newTab, false);
+                    }
+                });
+                plugin.addCommand({
+                    id: "new-prefixed-note-in-" + prefixedFolder.folder + "-new-pane",
+                    name: "New note in " + prefixedFolder.folder + "(open in new pane)",
                     callback: async () => {
                         const promptValue = await this.promptNewNote();
                         this.openNote(prefixedFolder.folder, promptValue, NotePlacement.newPane);
                     }
                 });
                 plugin.addCommand({
-                    id: "new-note-in-" + prefixedFolder.folder + "-new-window",
-                    name: "Create new note in " + prefixedFolder.folder + " and open in new window",
+                    id: "new-prefixed-note-in-" + prefixedFolder.folder + "-new-window",
+                    name: "New note in " + prefixedFolder.folder + "(open in new window)",
                     callback: async () => {
                         const promptValue = await this.promptNewNote();
                         this.openNote(prefixedFolder.folder, promptValue, NotePlacement.newWindow);
                     }
                 });
             }
+        });
+
+        plugin.addCommand({
+            id: "new-prefixed-inline-note-new-tab",
+            name: "New inline note (open in new tab)",
+            editorCallback: async (editor: Editor) => {
+                this.triggerInlineReplacement(editor, NotePlacement.newTab);
+            },
+        });
+        plugin.addCommand({
+            id: "new-prefixed-inline-note-background-tab",
+            name: "New inline note (open in background tab)",
+            editorCallback: async (editor: Editor) => {
+                this.triggerInlineReplacement(editor, NotePlacement.newTab, false);
+            },
+        });
+        plugin.addCommand({
+            id: "new-prefixed-inline-note-new-pane",
+            name: "New inline note (open in new pane)",
+            editorCallback: async (editor: Editor) => {
+                this.triggerInlineReplacement(editor, NotePlacement.newPane);
+            },
+        });
+        plugin.addCommand({
+            id: "new-prefixed-inline-note-new-window",
+            name: "New inline note (open in new window)",
+            editorCallback: async (editor: Editor) => {
+                this.triggerInlineReplacement(editor, NotePlacement.newWindow);
+            },
         });
     }
 
@@ -187,35 +238,44 @@ export default class RapidNotes extends Plugin {
         return promptValue.trim();
     }
 
-    async parseNoteName(filename: string) {
-        const prefixedFolders = this.getFoldersByPrefix(this.settings.prefixedFolders);
+    checkPrefix(filename: string) {
         let folderPath = "";
+        const prefixedFolders = this.getFoldersByPrefix(this.settings.prefixedFolders);
+        const firstSpaceIndex = filename.indexOf(" ");
+        if (firstSpaceIndex >= 0) {
+            // Prompt value has a space
+            const prefix = filename.substring(0, firstSpaceIndex);
+            if (prefix in prefixedFolders) {
+                // Prefix match found
+                folderPath = prefixedFolders[prefix].folder;
+                filename = filename.substring(firstSpaceIndex + 1);
+
+                // Check if a prefix needs to be added to the note, and add it correctly if the value is a path
+                const filenamePrefix = prefixedFolders[prefix].filenamePrefix.trim();
+                if(filenamePrefix) {
+                    const lastSlashIndex = filename.lastIndexOf("/");
+                    if (lastSlashIndex >= 0) {
+                        filename = filename.slice(0, lastSlashIndex + 1) + filenamePrefix + " " + filename.slice(lastSlashIndex + 1);
+                    } else {
+                        filename = filenamePrefix + " " + filename;
+                    }
+                }
+            }
+        }
+        return {
+            folderPath: folderPath,
+            filename: filename
+        }
+    }
+
+    async parseFilename(filename: string) {
+        var folderPath = "";
         const escapeSymbol = this.settings.escapeSymbol || "/";
         if (filename.charAt(0) === escapeSymbol) {
             // Prompt value is escaped, no prefix check needed
             filename = filename.substring(1);
         } else {
-            const firstSpaceIndex = filename.indexOf(" ");
-            if (firstSpaceIndex >= 0) {
-                // Prompt value has a space
-                const prefix = filename.substring(0, firstSpaceIndex);
-                if (prefix in prefixedFolders) {
-                    // Prefix match found
-                    folderPath = prefixedFolders[prefix].folder;
-                    filename = filename.substring(firstSpaceIndex + 1);
-
-                    // Check if a prefix needs to be added to the note, and add it correctly if the value is a path
-                    const filenamePrefix = prefixedFolders[prefix].filenamePrefix.trim();
-                    if(filenamePrefix) {
-                        const lastSlashIndex = filename.lastIndexOf("/");
-                        if (lastSlashIndex >= 0) {
-                            filename = filename.slice(0, lastSlashIndex + 1) + filenamePrefix + " " + filename.slice(lastSlashIndex + 1);
-                        } else {
-                            filename = filenamePrefix + " " + filename;
-                        }
-                    }
-                }
-            }
+            ({ folderPath, filename } = this.checkPrefix(filename));
         }
         if (!folderPath) {
             let folders:TFolder[] = this.getFolders();
@@ -228,14 +288,13 @@ export default class RapidNotes extends Plugin {
             const suggester = new SuggesterModal(folderPaths, folderPaths, "Choose folder");
             folderPath = await new Promise((resolve) => suggester.openAndGetValue(resolve, ()=>{}));
         }
-
         return {
             folderPath: folderPath,
             filename: filename
         }
     }
 
-    async openNote(path: string, filename: string, placement: NotePlacement) {
+    async openNote(path: string, filename: string, placement: NotePlacement, active:boolean=true) {
         const folder:TFolder = this.getFolders().find(folder => folder.path === path) || app.vault.getRoot();
         const fullFilePath = normalizePath(path + "/" + filename + ".md");
 
@@ -248,8 +307,10 @@ export default class RapidNotes extends Plugin {
             file = await app.fileManager.createNewMarkdownFile(folder, filename);
         }
         app.workspace.getLeaf(placement || false).openFile(file, {
-            state: { mode: "source" }
+            state: { mode: "source" },
+            active: active
         });
+        return file;
     }
 
     getFoldersByPrefix(foldersArray: PrefixFolderTuple[]): FoldersByPrefix {
@@ -264,6 +325,63 @@ export default class RapidNotes extends Plugin {
             }
         });
         return Array.from(folders);
+    }
+
+    async triggerInlineReplacement(editor: Editor, notePlacement: NotePlacement, active?: boolean) {
+
+        if (editor.somethingSelected()) {
+            const selection = editor.getSelection().trim();
+            const [selectionFilename, alias] = selection.split("|");
+            const {folderPath, filename} = await this.parseFilename(selectionFilename);
+            const file = await this.openNote(folderPath, filename, notePlacement, active);
+            if(file instanceof TFile) {
+                const replaceText = app.fileManager.generateMarkdownLink(file, "", "", alias || filename);
+                editor.replaceSelection(replaceText);
+            }
+
+        } else {
+            const range = editor.getCursor();
+            const line = editor.getLine(range.line);
+            const match = this.getLinkAtCurrentPosition(line, range.ch);
+
+            if(match) {
+                const {folderPath, filename} = await this.parseFilename(match.filename);
+                const file = await this.openNote(folderPath, filename, notePlacement, active);
+                // const fullFilePath = normalizePath(folderPath + "/" + filename);
+                // const replaceText = `[[${fullFilePath}|${match.alias || filename}]]`;
+                if(file instanceof TFile) {
+                    const replaceText = app.fileManager.generateMarkdownLink(file, "", "", match.alias || filename);
+
+                    // Replace text in editor
+                    const editorPositionStart: EditorPosition = {
+                        line: range.line,
+                        ch: match.start
+                    };
+                    const editorPositionEnd: EditorPosition = {
+                        line: range.line,
+                        ch: match.end
+                    };
+                    editor.replaceRange(replaceText, editorPositionStart, editorPositionEnd);
+                    editor.setCursor({ ch: match.start + replaceText.length, line: range.line });
+                }
+            }
+        }
+    }
+
+    getLinkAtCurrentPosition(line: string, position: number) {
+        const matches = [];
+        const regex = /\[{2}(.+?)(\|(.*?))?\]{2}/g;
+        let match;
+        while ((match = regex.exec(line)) !== null) {
+            matches.push({
+                fullMatch: match[0],
+                filename: match[1],
+                alias: match[3],
+                start: match.index,
+                end: regex.lastIndex
+            });
+        }
+        return matches.find(match => position >= match.start && position <= match.end) || null;
     }
 }
 
