@@ -1,5 +1,5 @@
 .rapid-notes_search {
-    width: calc(100% - 20px);
+    width: 100%;
 }
 
 .rapid-notes_prompt-div {
@@ -15,4 +15,23 @@
     flex-direction: column;
     align-items: center;
     margin-top: 1rem;
+}
+
+.rapid-notes-settings-entry input[type="text"]:first-child {
+    width: 90px;
+}
+
+.rapid-notes-settings-entry input[type="text"]:nth-child(2) {
+    width: 90px;
+}
+
+.rapid-notes-add-prefix-entry .setting-item-control {
+    margin-left: 20px;
+    padding-left: 20px;
+    align-self: flex-start;
+}
+
+.rapid-notes-settings-entry {
+    margin-top: 0!important;
+    padding-top: 0;
 }
