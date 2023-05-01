@@ -322,7 +322,7 @@ export default class RapidNotes extends Plugin {
     }
 
     async triggerInlineReplacement(editor: Editor, notePlacement: NotePlacement, active?: boolean) {
-
+        console.log(editor)
         if (editor.somethingSelected()) {
             const selection = editor.getSelection().trim();
             const [selectionFilename, alias] = selection.split("|");
@@ -385,6 +385,9 @@ class RapidNotesSettingsTab extends PluginSettingTab {
     }
 
     display(): void {
+        // Remove empty entries
+        // this.plugin.settings.prefixedFolders = this.plugin.settings.prefixedFolders.filter(prefixedFolder => prefixedFolder.folder != "");
+
         const {containerEl} = this;
         containerEl.empty();
         containerEl.createEl('h2', {text: 'Rapid Notes settings'});
@@ -423,18 +426,18 @@ class RapidNotesSettingsTab extends PluginSettingTab {
             .setButtonText("+")
             .setCta()
             .onClick(() => {
-                this.plugin.settings.prefixedFolders.push({
+                this.plugin.settings.prefixedFolders.unshift({
                     folder: "",
                     prefix: "",
                     filenamePrefix: "",
                     addCommand: false
                 });
-                this.plugin.saveSettings();
                 this.display();
             });
         });
 
         this.plugin.settings.prefixedFolders.forEach((prefixedFolder, index) => {
+            console.log("iterating...")
             const s = new Setting(this.containerEl)
             .addText((cb) => {
                 cb
