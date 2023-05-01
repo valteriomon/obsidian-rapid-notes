@@ -2072,6 +2072,7 @@ var RapidNotes = class extends import_obsidian5.Plugin {
     return promptValue.trim();
   }
   checkPrefix(filename) {
+    var _a;
     let folderPath = "";
     const prefixedFolders = this.getFoldersByPrefix(this.settings.prefixedFolders);
     const firstSpaceIndex = filename.indexOf(" ");
@@ -2080,7 +2081,7 @@ var RapidNotes = class extends import_obsidian5.Plugin {
       if (prefix in prefixedFolders) {
         folderPath = prefixedFolders[prefix].folder;
         filename = filename.substring(firstSpaceIndex + 1);
-        const filenamePrefix = prefixedFolders[prefix].filenamePrefix.trim();
+        const filenamePrefix = (_a = prefixedFolders[prefix].filenamePrefix) == null ? void 0 : _a.trim();
         if (filenamePrefix) {
           const lastSlashIndex = filename.lastIndexOf("/");
           if (lastSlashIndex >= 0) {

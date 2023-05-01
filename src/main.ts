@@ -245,7 +245,7 @@ export default class RapidNotes extends Plugin {
                 filename = filename.substring(firstSpaceIndex + 1);
 
                 // Check if a prefix needs to be added to the note, and add it correctly if the value is a path
-                const filenamePrefix = prefixedFolders[prefix].filenamePrefix.trim();
+                const filenamePrefix = prefixedFolders[prefix].filenamePrefix?.trim();
                 if(filenamePrefix) {
                     const lastSlashIndex = filename.lastIndexOf("/");
                     if (lastSlashIndex >= 0) {
