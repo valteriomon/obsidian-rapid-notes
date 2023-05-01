@@ -2223,7 +2223,7 @@ var RapidNotesSettingsTab = class extends import_obsidian5.PluginSettingTab {
     });
     new import_obsidian5.Setting(this.containerEl).setName("Add new prefixes (single words, case sensitive) or shortcuts and assign them to folders.").setDesc("Toggle available for adding a command to save directly into the folder. Relaunch the Obsidian or disable/enable the plugin for changes to take effect, either adding or removing a command,").addButton((button) => {
       button.setTooltip("Add additional prefix").setButtonText("+").setCta().onClick(() => {
-        this.plugin.settings.prefixedFolders.push({
+        this.plugin.settings.prefixedFolders.unshift({
           folder: "",
           prefix: "",
           filenamePrefix: "",
