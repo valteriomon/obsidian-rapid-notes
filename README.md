@@ -1,6 +1,18 @@
 # Rapid Notes Plugin
 
-Place notes in specific folders at the moment of creation using the prefixes defined in settings.
+Place notes in specific folders at the moment of creation using the prefixes defined in settings. Optionally add custom prefixes to the filenames and trigger the creation in specific folders with shortcuts.
+
+## New in version 1.2.0
+
+- **New feature:** You can add an actual prefix to the newly created note.
+- **New feature:** Instead of a single "Rapid Note" command, now you can open the file in the same tab, new tab, new pane or new window.
+- **New feature:** Add commands (which can be binded to hotkeys) that allow to trigger any entry and create the file directly into a folder (same as the Rapid Note command, it can be opened in same tab, new tab, new pane or new window).
+- **New feature:** If a used folder is renamed/deleted, a warning is shown. In case it's renamed, the entry is updated.
+- **New feature:** In folder suggester, show first the preferred saving location according to the Obsidian settings: Vault folder, the specified location, or same folder as current file.
+- **New setting:** If a new file trying to be created already exists, you can choose to open the existent file or create a new one with the same name followed by a number.
+- **New setting:** Customize the escape symbol ("/" by default)
+- **Discovered feature** *(because I didn't know it was a thing in Obsidian)* **:** If the filename contains "/" the full path is created: previously non existent folders and file.
+- **Bug fixes** *(and probably some new bugs introduced)* **:** Code improvements suggested by Obsidian Community reviewer, and removed lookbehind in regular expressions which could lead to issues in some iOS versions. Tested in iOS 16.4.1.
 
 ## How to use
 
