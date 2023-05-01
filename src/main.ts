@@ -154,7 +154,7 @@ export default class RapidNotes extends Plugin {
         plugin.settings.prefixedFolders.forEach((prefixedFolder) => {
             if(prefixedFolder.addCommand){
                 plugin.addCommand({
-                    id: "new-prefixed-note-in-" + prefixedFolder.folder,
+                    id: "new-prefixed-note-" + prefixedFolder.folder,
                     name: "New note in " + prefixedFolder.folder,
                     callback: async () => {
                         const promptValue = await this.promptNewNote();
@@ -162,7 +162,7 @@ export default class RapidNotes extends Plugin {
                     }
                 });
                 plugin.addCommand({
-                    id: "new-prefixed-note-in-" + prefixedFolder.folder + "-new-tab",
+                    id: "new-prefixed-note-" + prefixedFolder.folder + "-new-tab",
                     name: "New note in " + prefixedFolder.folder + "(open in new tab)",
                     callback: async () => {
                         const promptValue = await this.promptNewNote();
@@ -170,7 +170,7 @@ export default class RapidNotes extends Plugin {
                     }
                 });
                 plugin.addCommand({
-                    id: "new-prefixed-note-in-" + prefixedFolder.folder + "-new-background-tab",
+                    id: "new-prefixed-note-" + prefixedFolder.folder + "-new-background-tab",
                     name: "New note in " + prefixedFolder.folder + "(open in new background tab)",
                     callback: async () => {
                         const promptValue = await this.promptNewNote();
@@ -178,7 +178,7 @@ export default class RapidNotes extends Plugin {
                     }
                 });
                 plugin.addCommand({
-                    id: "new-prefixed-note-in-" + prefixedFolder.folder + "-new-pane",
+                    id: "new-prefixed-note-" + prefixedFolder.folder + "-new-pane",
                     name: "New note in " + prefixedFolder.folder + "(open in new pane)",
                     callback: async () => {
                         const promptValue = await this.promptNewNote();
@@ -186,7 +186,7 @@ export default class RapidNotes extends Plugin {
                     }
                 });
                 plugin.addCommand({
-                    id: "new-prefixed-note-in-" + prefixedFolder.folder + "-new-window",
+                    id: "new-prefixed-note-" + prefixedFolder.folder + "-new-window",
                     name: "New note in " + prefixedFolder.folder + "(open in new window)",
                     callback: async () => {
                         const promptValue = await this.promptNewNote();
@@ -197,28 +197,28 @@ export default class RapidNotes extends Plugin {
         });
 
         plugin.addCommand({
-            id: "new-prefixed-inline-note-new-tab",
+            id: "new-prefixed-note-inline-new-tab",
             name: "New inline note (open in new tab)",
             editorCallback: async (editor: Editor) => {
                 this.triggerInlineReplacement(editor, NotePlacement.newTab);
             },
         });
         plugin.addCommand({
-            id: "new-prefixed-inline-note-background-tab",
+            id: "new-prefixed-note-inline-background-tab",
             name: "New inline note (open in background tab)",
             editorCallback: async (editor: Editor) => {
                 this.triggerInlineReplacement(editor, NotePlacement.newTab, false);
             },
         });
         plugin.addCommand({
-            id: "new-prefixed-inline-note-new-pane",
+            id: "new-prefixed-note-inline-new-pane",
             name: "New inline note (open in new pane)",
             editorCallback: async (editor: Editor) => {
                 this.triggerInlineReplacement(editor, NotePlacement.newPane);
             },
         });
         plugin.addCommand({
-            id: "new-prefixed-inline-note-new-window",
+            id: "new-prefixed-note-inline-new-window",
             name: "New inline note (open in new window)",
             editorCallback: async (editor: Editor) => {
                 this.triggerInlineReplacement(editor, NotePlacement.newWindow);
@@ -341,11 +341,8 @@ export default class RapidNotes extends Plugin {
             if(match) {
                 const {folderPath, filename} = await this.parseFilename(match.filename);
                 const file = await this.openNote(folderPath, filename, notePlacement, active);
-                // const fullFilePath = normalizePath(folderPath + "/" + filename);
-                // const replaceText = `[[${fullFilePath}|${match.alias || filename}]]`;
                 if(file instanceof TFile) {
                     const replaceText = app.fileManager.generateMarkdownLink(file, "", "", match.alias || filename);
-
                     // Replace text in editor
                     const editorPositionStart: EditorPosition = {
                         line: range.line,

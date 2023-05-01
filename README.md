@@ -4,14 +4,14 @@ Place notes in specific folders at the moment of creation using the prefixes def
 
 ## New in version 1.2.0
 
-- **New feature:** You can add an actual prefix to the newly created note.
+- **New feature and setting:** You can add an actual prefix to the newly created note.
 - **New feature:** You can trigger the rapid note functionality from the editor, calling the command with the cursor placed inside a string in double brackets, or on any selected text. Support for aliases and link is replaced according to the app settings (if Wikilinks or Markdown is preferred).
-- **New feature:** Instead of a single "Rapid Note" command, now you can open the file in the same tab, new tab, background tab, new pane or new window.
-- **New feature:** Add commands (which can be binded to hotkeys) that allow to trigger any entry and create the file directly into a folder (same as the Rapid Note command, it can be opened in same tab, new tab, background tab, new pane or new window).
+- **New commands:** Instead of a single "Rapid Note" command, now you can open the file in the same tab, new tab, background tab, new pane or new window.
+- **New toggle in settings and commands:** Add commands (which can be binded to hotkeys) that allow to trigger any entry and create the file directly into a folder (same as the Rapid Note command, it can be opened in same tab, new tab, background tab, new pane or new window).
 - **New feature:** If a used folder is renamed/deleted, a warning is shown. In case it's renamed, the entry is updated.
 - **New feature:** In folder suggester, show first the preferred saving location according to the Obsidian settings: Vault folder, the specified location, or same folder as current file.
 - **New setting:** If a new file trying to be created already exists, you can choose to open the existent file or create a new one with the same name followed by a number.
-- **New setting:** Customize the escape symbol ("/" by default)
+- **New setting:** Customize the escape symbol ("/" by default).
 - **Discovered feature** *(because I didn't know it was a thing in Obsidian)* **:** If the filename contains "/" the full path is created: previously non existent folders and file.
 - **Bug fixes** *(and probably some new bugs introduced)* **:** Code improvements suggested by Obsidian Community reviewer, and removed lookbehind in regular expressions which could lead to issues in some iOS versions. Tested in iOS 16.4.1.
 
