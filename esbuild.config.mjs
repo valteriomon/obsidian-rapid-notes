@@ -1,6 +1,7 @@
 import esbuild from "esbuild";
 import process from "process";
-import builtins from 'builtin-modules'
+import builtins from 'builtin-modules';
+import { copy } from "esbuild-plugin-copy";
 
 const banner =
 `/*
@@ -35,6 +36,14 @@ esbuild.build({
 	format: 'cjs',
 	watch: !prod,
 	target: 'es2018',
+	plugins: [
+		copy({
+			assets: {
+				from: ['./styles.css', './manifest.json'],
+				to: ['.'],
+			},
+		})
+	],
 	logLevel: "info",
 	sourcemap: prod ? false : 'inline',
 	treeShaking: true,
