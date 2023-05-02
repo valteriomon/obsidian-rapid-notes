@@ -1,37 +1,45 @@
+/* Prompt */
+.rapid-notes-modal input {
+    width: 100%;
+}
+
 .rapid-notes_search {
     width: 100%;
 }
 
-.rapid-notes_prompt-div {
-    display: flex;
+.rapid-notes-modal  .modal-title {
+    text-align: center;
 }
 
-.rapid-notes_prompt-input {
-    flex-grow: 1;
-}
-
-.rapid-notes_button-div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 1rem;
-}
-
-.rapid-notes-settings-entry input[type="text"]:first-child {
-    width: 90px;
-}
-
-.rapid-notes-settings-entry input[type="text"]:nth-child(2) {
-    width: 90px;
-}
-
+/* Settings */
 .rapid-notes-add-prefix-entry .setting-item-control {
-    margin-left: 20px;
-    padding-left: 20px;
     align-self: flex-start;
 }
 
 .rapid-notes-settings-entry {
     margin-top: 0!important;
     padding-top: 0;
+}
+
+@media screen and (min-width: 780px) {
+    .rapid-notes-settings-entry input[type="text"]:first-child {
+        max-width: 60px;
+    }
+    .rapid-notes-settings-entry input[type="text"]:nth-child(2) {
+        max-width: 90px;
+    }
+}
+
+@media screen and (max-width: 780px) {
+    .rapid-notes-settings-entry .setting-item-control {
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .rapid-notes-settings-entry input[type="text"]:first-child,
+    .rapid-notes-settings-entry input[type="text"]:nth-child(2) {
+        flex-grow: 1;
+        flex-basis: 44%;
+        width: 100%;
+    }
 }

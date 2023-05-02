@@ -39,13 +39,25 @@ esbuild.build({
 	plugins: [
 		copy({
 			assets: {
-				from: ['./styles.css', './manifest.json'],
-				to: ['.'],
+				from: ['main.js'],
+				to: ['./build/main.js'],
+			},
+		}),
+		copy({
+			assets: {
+				from: ['manifest.json'],
+				to: ['./build/manifest.json'],
+			},
+		}),
+		copy({
+			assets: {
+				from: ['styles.css'],
+				to: ['./build/styles.css'],
 			},
 		})
 	],
 	logLevel: "info",
 	sourcemap: prod ? false : 'inline',
 	treeShaking: true,
-	outfile: prod ? 'build/main.js' : 'main.js',
+	outfile: 'main.js',
 }).catch(() => process.exit(1));

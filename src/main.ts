@@ -236,7 +236,7 @@ export default class RapidNotes extends Plugin {
     }
 
     async promptNewNote() {
-        const prompt = new PromptModal("New note", "", false);
+        const prompt = new PromptModal("New note", "", false, "rapid-notes-modal");
         let promptValue: string = await new Promise((resolve) => prompt.openAndGetValue((resolve), ()=>{}));
         return promptValue.trim();
     }
