@@ -10,6 +10,8 @@ Place notes in specific folders at the moment of creation using the prefixes def
 - **New toggle in settings and commands:** Add commands (which can be binded to hotkeys) that allow to trigger any entry and create the file directly into a folder (same as the Rapid Note command, it can be opened in same tab, new tab, background tab, new pane or new window).
 - **New feature:** If a used folder is renamed/deleted, a warning is shown. In case it's renamed, the entry is updated.
 - **New feature:** In folder suggester, show first the preferred saving location according to the Obsidian settings: Vault folder, the specified location, or same folder as current file.
+- **New feature and setting:** Updated modal with the list of prefixes as memory help. Can be disabled through the settings.
+- **New feature:** Plugin styles improved for the mobile experience.
 - **New setting:** If a new file trying to be created already exists, you can choose to open the existent file or create a new one with the same name followed by a number.
 - **New setting:** Add a custom separator for all prefixes.
 - **New setting:** Customize the escape symbol ("/" by default).

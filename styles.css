@@ -1,17 +1,25 @@
 /* Prompt */
-.rapid-notes-modal input {
-    width: 100%;
+.rapid-notes-modal .prompt-instructions {
+    border-top: 0;
 }
 
+.rapid-notes-modal .prompt-instructions .prompt-instruction-command {
+    color: var(--interactive-accent);
+}
+
+.rapid-notes-modal .prompt-instructions-heading {
+    font-weight: 700;
+}
+
+.is-phone .rapid-notes-modal .prompt-instructions {
+    display: block;
+}
+
+/* Settings */
 .rapid-notes_search {
     width: 100%;
 }
 
-.rapid-notes-modal  .modal-title {
-    text-align: center;
-}
-
-/* Settings */
 .rapid-notes-add-prefix-entry .setting-item-control {
     align-self: flex-start;
 }

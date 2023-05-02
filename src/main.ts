@@ -40,6 +40,7 @@ export interface FoldersByPrefix {
 export interface RapidNotesSettings {
     prefixedFolders: Array<PrefixFolderTuple>;
     forceFileCreation: boolean;
+    showModalSuggestions: boolean;
     escapeSymbol: string;
     realPrefixSeparator: string;
 }
@@ -47,6 +48,7 @@ export interface RapidNotesSettings {
 const DEFAULT_SETTINGS = {
     prefixedFolders: [{ folder: "", prefix: "" }],
     forceFileCreation: false,
+    showModalSuggestions: true,
     escapeSymbol: "/",
     realPrefixSeparator: " "
 };
@@ -166,7 +168,7 @@ export default class RapidNotes extends Plugin {
                     id: "new-prefixed-note-" + prefixedFolder.folder,
                     name: "New note in " + prefixedFolder.folder,
                     callback: async () => {
-                        const promptValue = await this.promptNewNote();
+                        const promptValue = await this.promptNewNote(prefixedFolder.folder);
                         this.openNote(prefixedFolder.folder, fullPrefix + promptValue, NotePlacement.sameTab);
                     }
                 });
@@ -174,7 +176,7 @@ export default class RapidNotes extends Plugin {
                     id: "new-prefixed-note-" + prefixedFolder.folder + "-new-tab",
                     name: "New note in " + prefixedFolder.folder + " (open in new tab)",
                     callback: async () => {
-                        const promptValue = await this.promptNewNote();
+                        const promptValue = await this.promptNewNote(prefixedFolder.folder);
                         this.openNote(prefixedFolder.folder, fullPrefix + promptValue, NotePlacement.newTab);
                     }
                 });
@@ -182,7 +184,7 @@ export default class RapidNotes extends Plugin {
                     id: "new-prefixed-note-" + prefixedFolder.folder + "-new-background-tab",
                     name: "New note in " + prefixedFolder.folder + " (open in new background tab)",
                     callback: async () => {
-                        const promptValue = await this.promptNewNote();
+                        const promptValue = await this.promptNewNote(prefixedFolder.folder);
                         this.openNote(prefixedFolder.folder, fullPrefix + promptValue, NotePlacement.newTab, false);
                     }
                 });
@@ -190,7 +192,7 @@ export default class RapidNotes extends Plugin {
                     id: "new-prefixed-note-" + prefixedFolder.folder + "-new-pane",
                     name: "New note in " + prefixedFolder.folder + " (open in new pane)",
                     callback: async () => {
-                        const promptValue = await this.promptNewNote();
+                        const promptValue = await this.promptNewNote(prefixedFolder.folder);
                         this.openNote(prefixedFolder.folder, fullPrefix + promptValue, NotePlacement.newPane);
                     }
                 });
@@ -198,7 +200,7 @@ export default class RapidNotes extends Plugin {
                     id: "new-prefixed-note-" + prefixedFolder.folder + "-new-window",
                     name: "New note in " + prefixedFolder.folder + " (open in new window)",
                     callback: async () => {
-                        const promptValue = await this.promptNewNote();
+                        const promptValue = await this.promptNewNote(prefixedFolder.folder);
                         this.openNote(prefixedFolder.folder, fullPrefix + promptValue, NotePlacement.newWindow);
                     }
                 });
@@ -235,8 +237,19 @@ export default class RapidNotes extends Plugin {
         });
     }
 
-    async promptNewNote() {
-        const prompt = new PromptModal("New note", "", false, "rapid-notes-modal");
+    async promptNewNote(folder: string = "") {
+        let placeholder = "New note";
+        let modalSuggestions = Array();
+        let showSuggestions = this.settings.showModalSuggestions;
+
+        if(folder) {
+            placeholder += ` in ${folder}`;
+            showSuggestions = false;
+        }
+        if(showSuggestions) {
+            modalSuggestions = this.settings.prefixedFolders.map((item)=>{ return {"command": item.prefix, "purpose": item.folder } });
+        }
+        const prompt = new PromptModal(placeholder, "rapid-notes-modal", modalSuggestions);
         let promptValue: string = await new Promise((resolve) => prompt.openAndGetValue((resolve), ()=>{}));
         return promptValue.trim();
     }
@@ -406,7 +419,7 @@ class RapidNotesSettingsTab extends PluginSettingTab {
         const {containerEl} = this;
         containerEl.empty();
         containerEl.createEl('h2', {text: 'Rapid Notes settings'});
-        containerEl.createEl('p', {text: '[New!] Now you can also create notes and link to them directly from the editor while typing using the plugin inline commands. You can trigger the command while the cursor is inside the text in double brackets, or just by selecting any text in the editor.'});
+        containerEl.createEl('p', {text: '[New!] Now you can also create notes and link to them directly from the editor while typing using the plugin inline commands. You can trigger the command while the cursor is inside the link in double brackets, or just by selecting any text in the editor.'});
 
         new Setting(this.containerEl)
         .setName("Force file creation adding a number at the end if the folder/filename is already in use. Default behavior will open the existing file.")
@@ -415,6 +428,17 @@ class RapidNotesSettingsTab extends PluginSettingTab {
             .setValue(this.plugin.settings.forceFileCreation)
             .onChange((forceFileCreation) => {
                 this.plugin.settings.forceFileCreation = forceFileCreation;
+                this.plugin.saveSettings();
+            });
+        });
+
+        new Setting(this.containerEl)
+        .setName("Show prefix list in note creation modal.")
+        .addToggle((toggle) => {
+            toggle
+            .setValue(this.plugin.settings.showModalSuggestions)
+            .onChange((showModalSuggestions) => {
+                this.plugin.settings.showModalSuggestions = showModalSuggestions;
                 this.plugin.saveSettings();
             });
         });

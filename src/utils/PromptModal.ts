@@ -1,35 +1,83 @@
-// Credits go to SilentVoid13's Templater Plugin: https://github.com/SilentVoid13/Templater
-
 import {
-    ButtonComponent,
     Modal,
-    Platform,
-    TextAreaComponent,
-    TextComponent,
+    Instruction,
 } from "obsidian";
 
 export class PromptModal extends Modal {
     private resolve: (value: string) => void;
     private reject: () => void;
     private submitted = false;
-    private value: string;
+
+    inputEl: HTMLInputElement;
+    instructionsHeadingEl: HTMLElement;
+    instructionsListEl: HTMLElement;
+    inputListener: EventListener;
 
     constructor(
-        private prompt_text: string,
-        private default_value: string,
-        private multi_line: boolean,
-        private prompt_class: string,
+        private placeholder: string,
+        private promptClass: string,
+        private instructions: Instruction[]
     ) {
         super(app);
+
+        // Create input
+        this.inputEl = document.createElement('input');
+        this.inputEl.type = 'text';
+        this.inputEl.placeholder = placeholder;
+        this.inputEl.className = 'prompt-input';
+
+        this.modalEl.className = `prompt ${this.promptClass}`;
+        this.modalEl.innerHTML = '';
+        this.modalEl.appendChild(this.inputEl);
+
+        if(instructions.length) {
+            // Suggestions block
+            this.instructionsHeadingEl = document.createElement('div');
+            this.instructionsHeadingEl.className = 'prompt-instructions prompt-instructions-heading';
+            this.instructionsHeadingEl.innerText = "Prefixed folders:";
+
+            this.instructionsListEl = document.createElement('div');
+            this.instructionsListEl.addClass('prompt-instructions');
+            const children = instructions.map((instruction) => {
+                const child = document.createElement('div');
+                child.addClass('prompt-instruction');
+
+                const command = document.createElement('span');
+                command.addClass('prompt-instruction-command');
+                command.innerText = instruction.command;
+                child.appendChild(command);
+
+                const purpose = document.createElement('span');
+                purpose.innerText = instruction.purpose;
+                child.appendChild(purpose);
+
+                return child;
+            });
+            for (const child of children) {
+                this.instructionsListEl.appendChild(child);
+            }
+            this.modalEl.appendChild(this.instructionsHeadingEl);
+            this.modalEl.appendChild(this.instructionsListEl);
+        }
+
+        this.inputListener = this.listenInput.bind(this);
+    }
+
+    listenInput(evt: KeyboardEvent) {
+        if (evt.key === 'Enter') {
+            // prevent enter after note creation
+            evt.preventDefault();
+            this.enterCallback(evt);
+        }
     }
 
     onOpen(): void {
-        this.modalEl.addClass(this.prompt_class);
-        this.titleEl.setText(this.prompt_text);
-        this.createForm();
+        this.inputEl.focus();
+        this.inputEl.addEventListener('keydown', this.inputListener);
     }
 
     onClose(): void {
+        this.inputEl.removeEventListener('keydown', this.inputListener);
         this.contentEl.empty();
         if (!this.submitted) {
             // TOFIX: for some reason throwing Error on iOS causes the app to freeze.
@@ -37,60 +85,16 @@ export class PromptModal extends Modal {
         }
     }
 
-    createForm(): void {
-        const div = this.contentEl.createDiv();
-        div.addClass("prompt-div");
-        let textInput;
-        if (this.multi_line) {
-            textInput = new TextAreaComponent(div);
-
-            // Add submit button since enter needed for multiline input on mobile
-            const buttonDiv = this.contentEl.createDiv();
-            buttonDiv.addClass("button-div");
-            const submitButton = new ButtonComponent(buttonDiv);
-            submitButton.buttonEl.addClass("mod-cta");
-            submitButton.setButtonText("Submit").onClick((evt: Event) => {
-                this.resolveAndClose(evt);
-            });
-        } else {
-            textInput = new TextComponent(div);
-        }
-
-        this.value = this.default_value ?? "";
-        textInput.inputEl.addClass("prompt-input");
-        textInput.setPlaceholder("Type text here");
-        textInput.setValue(this.value);
-        textInput.onChange((value) => (this.value = value));
-        textInput.inputEl.addEventListener("keydown", (evt: KeyboardEvent) =>
-            this.enterCallback(evt)
-        );
-    }
-
     private enterCallback(evt: KeyboardEvent) {
-        if (this.multi_line) {
-            if (Platform.isDesktop) {
-                // eslint-disable-next-line no-empty
-                if (evt.shiftKey && evt.key === "Enter") {
-                } else if (evt.key === "Enter") {
-                    this.resolveAndClose(evt);
-                }
-            } else {
-                // allow pressing enter on mobile for multi-line input
-                if (evt.key === "Enter") {
-                    evt.preventDefault();
-                }
-            }
-        } else {
-            if (evt.key === "Enter") {
-                this.resolveAndClose(evt);
-            }
+        if (evt.key === "Enter") {
+            this.resolveAndClose(evt);
         }
     }
 
     private resolveAndClose(evt: Event | KeyboardEvent) {
         this.submitted = true;
         evt.preventDefault();
-        this.resolve(this.value);
+        this.resolve(this.inputEl.value);
         this.close();
     }
 
