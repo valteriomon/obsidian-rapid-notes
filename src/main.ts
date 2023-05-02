@@ -46,7 +46,7 @@ export interface RapidNotesSettings {
 }
 
 const DEFAULT_SETTINGS = {
-    prefixedFolders: [{ folder: "", prefix: "" }],
+    prefixedFolders: [],
     forceFileCreation: false,
     showModalSuggestions: true,
     escapeSymbol: "/",
