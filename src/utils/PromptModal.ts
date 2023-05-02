@@ -9,13 +9,12 @@ export class PromptModal extends Modal {
     private submitted = false;
 
     inputEl: HTMLInputElement;
-    instructionsHeadingEl: HTMLElement;
-    instructionsListEl: HTMLElement;
     inputListener: EventListener;
 
     constructor(
         private placeholder: string,
         private promptClass: string,
+        private escapeSymbol: string,
         private instructions: Instruction[]
     ) {
         super(app);
@@ -32,12 +31,16 @@ export class PromptModal extends Modal {
 
         if(instructions.length) {
             // Suggestions block
-            this.instructionsHeadingEl = document.createElement('div');
-            this.instructionsHeadingEl.className = 'prompt-instructions prompt-instructions-heading';
-            this.instructionsHeadingEl.innerText = "Prefixed folders:";
+            const instructionsHeadingEl = document.createElement('div');
+            instructionsHeadingEl.className = 'prompt-instructions prompt-instructions-heading';
+            instructionsHeadingEl.innerText = "Prefixed folders:";
 
-            this.instructionsListEl = document.createElement('div');
-            this.instructionsListEl.addClass('prompt-instructions');
+            const instructionsFooterEl = document.createElement('div');
+            instructionsFooterEl.className = 'prompt-instructions';
+            instructionsFooterEl.innerHTML = `Use <code>${this.escapeSymbol}</code> to escape the prefix.`;
+
+            const instructionsListEl = document.createElement('div');
+            instructionsListEl.addClass('prompt-instructions');
             const children = instructions.map((instruction) => {
                 const child = document.createElement('div');
                 child.addClass('prompt-instruction');
@@ -54,10 +57,11 @@ export class PromptModal extends Modal {
                 return child;
             });
             for (const child of children) {
-                this.instructionsListEl.appendChild(child);
+                instructionsListEl.appendChild(child);
             }
-            this.modalEl.appendChild(this.instructionsHeadingEl);
-            this.modalEl.appendChild(this.instructionsListEl);
+            this.modalEl.appendChild(instructionsHeadingEl);
+            this.modalEl.appendChild(instructionsListEl);
+            this.modalEl.appendChild(instructionsFooterEl);
         }
 
         this.inputListener = this.listenInput.bind(this);
