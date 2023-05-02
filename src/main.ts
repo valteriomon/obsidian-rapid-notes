@@ -41,6 +41,7 @@ export interface RapidNotesSettings {
     prefixedFolders: Array<PrefixFolderTuple>;
     forceFileCreation: boolean;
     showModalSuggestions: boolean;
+    capitalizeFilename: boolean;
     escapeSymbol: string;
     realPrefixSeparator: string;
 }
@@ -49,6 +50,7 @@ const DEFAULT_SETTINGS = {
     prefixedFolders: [],
     forceFileCreation: false,
     showModalSuggestions: true,
+    capitalizeFilename: true,
     escapeSymbol: "/",
     realPrefixSeparator: " "
 };
@@ -321,6 +323,9 @@ export default class RapidNotes extends Plugin {
             return;
         } else if(file === null || this.settings.forceFileCreation) {
             // Create note if it doesn't exist
+            if(this.settings.capitalizeFilename) {
+                filename = filename.split('/').map(substring => substring.charAt(0).toUpperCase() + substring.slice(1)).join('/');
+            }
             file = await app.fileManager.createNewMarkdownFile(folder, filename);
         }
         app.workspace.getLeaf(placement || false).openFile(file, {
@@ -457,12 +462,23 @@ class RapidNotesSettingsTab extends PluginSettingTab {
         });
 
         new Setting(this.containerEl)
-        .setName("Optional separator between the prefix and the filename (space character by default)")
+        .setName("Optional separator between the prefix and the filename (space character by default).")
         .addText((cb) => {
             cb
             .setValue(this.plugin.settings.realPrefixSeparator)
             .onChange((realPrefixSeparator) => {
                 this.plugin.settings.realPrefixSeparator = realPrefixSeparator;
+                this.plugin.saveSettings();
+            });
+        });
+
+        new Setting(this.containerEl)
+        .setName("Capitalize note name and new folders.")
+        .addToggle((toggle) => {
+            toggle
+            .setValue(this.plugin.settings.capitalizeFilename)
+            .onChange((capitalizeFilename) => {
+                this.plugin.settings.capitalizeFilename = capitalizeFilename;
                 this.plugin.saveSettings();
             });
         });

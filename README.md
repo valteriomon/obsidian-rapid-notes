@@ -4,19 +4,30 @@ Place notes in specific folders at the moment of creation using the prefixes def
 
 ## New in version 1.2
 
-- **New feature and setting:** You can add an actual prefix to the newly created note.
-- **New feature:** You can trigger the rapid note functionality from the editor, calling the command with the cursor placed inside a string in double brackets, or on any selected text. Support for aliases and link is replaced according to the app settings (if Wikilinks or Markdown is preferred).
-- **New commands:** Instead of a single "Rapid Note" command, now you can open the file in the same tab, new tab, background tab, new pane or new window.
-- **New toggle in settings and commands:** Add commands (which can be binded to hotkeys) that allow to trigger any entry and create the file directly into a folder (same as the Rapid Note command, it can be opened in same tab, new tab, background tab, new pane or new window).
-- **New feature:** If a used folder is renamed/deleted, a warning is shown. In case it's renamed, the entry is updated.
-- **New feature:** In folder suggester, show first the preferred saving location according to the Obsidian settings: Vault folder, the specified location, or same folder as current file.
-- **New feature and setting:** Updated modal with the list of prefixes as memory help. Can be disabled through the settings.
-- **New feature:** Plugin styles improved for the mobile experience.
-- **New setting:** If a new file trying to be created already exists, you can choose to open the existent file or create a new one with the same name followed by a number.
-- **New setting:** Add a custom separator for all prefixes.
-- **New setting:** Customize the escape symbol ("/" by default).
-- **Discovered feature** *(because I didn't know it was a thing in Obsidian)* **:** If the filename contains "/" the full path is created: previously non existent folders and file.
-- **Bug fixes** *(and probably some new bugs introduced)* **:** Code improvements suggested by Obsidian Community reviewer, and removed lookbehind in regular expressions which could lead to issues in some iOS versions. Tested in iOS 16.4.1.
+### Create notes into your folders right from the editor
+- You can trigger the rapid note functionality from the editor, calling the command with the cursor placed within a text in double brackets, or selecting text, with akuas support incorporated.
+### New features with settings available
+- You can add an actual prefix to the name of the created note.
+- Customize the escape symbol used to avoid moving the note based on the prefix ("/" by default).
+- Add a common separator between the prefix and the filename.
+- If the new file about to be created already exists, you can choose to open the existent file or create a new one with the same name followed by a number.
+- Updated modal with the list of prefixes as memory help. Can be disabled through the settings.
+- Option to capitalize the folder and file names.
+- Add commands (which can be binded to hotkeys) that allow you to trigger any prefix entry and create the file directly into a folder (same as the Rapid Note command, it can be opened in same tab, new tab, background tab, new pane or new window).
+
+### New commands
+- Instead of a single "Rapid Note" command, now you can open the file in the same tab, new tab, background tab, new pane or new window.
+
+### New hidden features
+- If a used folder is renamed/deleted, a warning is shown. In case it's renamed, the entry is updated.
+- In the folder suggester, show first the preferred saving location according to the Obsidian settings: Vault folder, an specified location, or the same folder as the current active file.
+- If the filename contains "/" the full path is created: folders and filename following the last slash character.
+
+### More
+- Plugin styles improved for the mobile experience.
+- Lots of bug fixes and code improvements. Removed lookbehind in regular expressions which could lead to issues in some iOS versions. Tested in iOS 16.4.1.
+- Newly introduced bugs to be fixed.
+
 
 ## How to use
 
@@ -26,13 +37,11 @@ In the plugin settings add prefix/folder pairs, considering prefixes must be sin
 
 If you have a folder named `JavaScript` in your vault where you save all notes regarding JavaScript, you could add in the Rapid Notes settings the prefix `js` and assign it to said folder. Upon triggering the command to create a new note, you could enter into the prompt `js Promises` and a new file named `Promises` will be saved into the `JavaScript` folder.
 
-![Example of basic usage](./assets/basic-usage.gif)
 
 ## Example of escaped prefix
 
 If you have your `js` prefix set, but you wish to create a new file named `js rulez`, then you can simply input `/js rulez` into the prompt and you will be prompted to select where to create the new file.
 
-![Example of basic usage](./assets/escape-filenames.gif)
 
 ## Considerations
 
