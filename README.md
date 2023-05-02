@@ -2,7 +2,7 @@
 
 Place notes in specific folders at the moment of creation using the prefixes defined in settings. Optionally add custom prefixes to the filenames and trigger the creation in specific folders with shortcuts or from the editor while typing links.
 
-## New in version 1.2.0
+## New in version 1.2
 
 - **New feature and setting:** You can add an actual prefix to the newly created note.
 - **New feature:** You can trigger the rapid note functionality from the editor, calling the command with the cursor placed inside a string in double brackets, or on any selected text. Support for aliases and link is replaced according to the app settings (if Wikilinks or Markdown is preferred).

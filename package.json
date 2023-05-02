@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-rapid-notes",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"description": "Place notes in specific folders at the moment of creation using the prefixes defined in settings. Optionally add custom prefixes to the filenames and trigger the creation in specific folders with shortcuts or from the editor while typing links.",
 	"main": "main.js",
 	"scripts": {
