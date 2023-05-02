@@ -1,10 +1,10 @@
 name: Build obsidian plugin
 
-on:
-  push:
-    # Sequence of patterns matched against refs/tags
-    tags:
-      - "*" # Push events to matching any tag format, i.e. 1.0, 20.15.10
+on: workflow_dispatch
+  # push:
+  #   # Sequence of patterns matched against refs/tags
+  #   tags:
+  #     - "*" # Push events to matching any tag format, i.e. 1.0, 20.15.10
 
 env:
   PLUGIN_NAME: obsidian-rapid-notes # Change this to the name of your plugin-id folder
