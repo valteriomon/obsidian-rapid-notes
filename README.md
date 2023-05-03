@@ -47,12 +47,9 @@ If you have your `js` prefix set, but you wish to create a new file named `js ru
 
 - You can combine Rapid Notes with [Templater plugin](https://github.com/SilentVoid13/Templater) to speed up your workflow even further, assigning templates for folders and enabling the setting to trigger Templater on file creation.
 
-## Manually installing the plugin
+## Installation
 
-1. Download the `main.js`, `styles.css`, `manifest.json` from the release.
-2. Create a folder named `obsidian-rapid-notes` inside your vault's plugins folder (`VaultFolder/.obsidian/plugins/`).
-3. Add the downloaded files to the `obsidian-rapid-notes` folder.
-4. Enable plugin in settings window.
+Find "Rapid Notes" in the Community plugins through the Obsidian app!
 
 ## Development
 
