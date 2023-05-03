@@ -5,7 +5,7 @@ Place notes in specific folders at the moment of creation using the prefixes def
 ## New in version 1.2
 
 ### Create notes into your folders right from the editor
-- You can trigger the rapid note functionality from the editor, calling the command with the cursor placed within a text in double brackets, or selecting text, with akuas support incorporated.
+- You can trigger the rapid note functionality from the editor, calling the command with the cursor placed within a text in double brackets, or selecting text, with alias support incorporated.
 ### New features with settings available
 - You can add an actual prefix to the name of the created note.
 - Customize the escape symbol used to avoid moving the note based on the prefix ("/" by default).
