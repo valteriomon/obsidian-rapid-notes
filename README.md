@@ -46,7 +46,6 @@ If you have your `js` prefix set, but you wish to create a new file named `js ru
 ## Considerations
 
 - You can combine Rapid Notes with [Templater plugin](https://github.com/SilentVoid13/Templater) to speed up your workflow even further, assigning templates for folders and enabling the setting to trigger Templater on file creation.
-- I considered creating a special prefix for adding quick notes into an Inbox folder (or vault root) without being prompted with the folder suggester, but for now I'm just using the default new note functionatlity and setting the inbox folder as the "Default location for new notes".
 
 ## Manually installing the plugin
 
