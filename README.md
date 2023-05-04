@@ -28,6 +28,11 @@ Place notes in specific folders at the moment of creation using the prefixes def
 - Lots of bug fixes and code improvements. Removed lookbehind in regular expressions which could lead to issues in some iOS versions. Tested in iOS 16.4.1.
 - Newly introduced bugs to be fixed.
 
+# Quick demo video
+
+A couple of notes the video may not be too clear about: when creating a new note from the editor from a selection, the link to it is created. The escaping character ("/" by default) works both inline and on the prompt.
+
+![Example of basic usage](./assets/quick-demo.gif)
 
 ## How to use
 
