@@ -5,7 +5,7 @@ Place notes in specific folders at the moment of creation using the prefixes def
 ## New in version 1.2
 
 ### Create notes into your folders right from the editor
-- You can trigger the rapid note functionality from the editor, calling the command with the cursor placed within a text in double brackets, or selecting text, with akuas support incorporated.
+- You can trigger the rapid note functionality from the editor, calling the command with the cursor placed within a text in double brackets, or selecting text, with alias support incorporated.
 ### New features with settings available
 - You can add an actual prefix to the name of the created note.
 - Customize the escape symbol used to avoid moving the note based on the prefix ("/" by default).
@@ -51,14 +51,10 @@ If you have your `js` prefix set, but you wish to create a new file named `js ru
 ## Considerations
 
 - You can combine Rapid Notes with [Templater plugin](https://github.com/SilentVoid13/Templater) to speed up your workflow even further, assigning templates for folders and enabling the setting to trigger Templater on file creation.
-- I considered creating a special prefix for adding quick notes into an Inbox folder (or vault root) without being prompted with the folder suggester, but for now I'm just using the default new note functionatlity and setting the inbox folder as the "Default location for new notes".
 
-## Manually installing the plugin
+## Installation
 
-1. Download the `main.js`, `styles.css`, `manifest.json` from the release.
-2. Create a folder named `obsidian-rapid-notes` inside your vault's plugins folder (`VaultFolder/.obsidian/plugins/`).
-3. Add the downloaded files to the `obsidian-rapid-notes` folder.
-4. Enable plugin in settings window.
+Find "Rapid Notes" in the Community plugins through the Obsidian app!
 
 ## Development
 
