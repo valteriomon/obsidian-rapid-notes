@@ -9,6 +9,8 @@
 - Choose to focus on new note or not
 - Pick template for note
 - Add pinned folders to suggester
+- Impreove demo
+- "Fuzzy search" prefixes (dynamic helpbox)
 
 Place notes in specific folders at the moment of creation using the prefixes defined in settings. Optionally add custom prefixes to the filenames and trigger the creation in specific folders with shortcuts or from the editor while typing links.
 
