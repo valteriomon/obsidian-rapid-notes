@@ -1,5 +1,14 @@
 # Rapid Notes Plugin
 
+## To do in version 1.2.6
+- Refactor code
+- Add/remove commands without the need to reload Obsidian/plugin
+- Add tests
+- Note refactoring capability
+- Choose opening preference from dropdown (avoid creating too many commands)
+- Choose to focus on new note or not
+- Pick template for note
+
 Place notes in specific folders at the moment of creation using the prefixes defined in settings. Optionally add custom prefixes to the filenames and trigger the creation in specific folders with shortcuts or from the editor while typing links.
 
 ## New in version 1.2
