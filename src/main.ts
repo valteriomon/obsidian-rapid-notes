@@ -258,7 +258,7 @@ export default class RapidNotes extends Plugin {
             showSuggestions = false;
         }
         if(showSuggestions) {
-            modalSuggestions = this.settings.prefixedFolders.map((item)=>{ return {"command": item.prefix, "purpose": item.folder } });
+            modalSuggestions = this.settings.prefixedFolders.map((item)=>{ return {"command": item.prefix, "purpose": this.resolvePlaceholderValues(item.folder) } });
         }
         const escapeSymbol = this.settings.escapeSymbol || "/";
         const prompt = new PromptModal(placeholder, "rapid-notes-modal", escapeSymbol, modalSuggestions);
