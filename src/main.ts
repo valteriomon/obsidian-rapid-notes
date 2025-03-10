@@ -331,7 +331,7 @@ export default class RapidNotes extends Plugin {
     }
 
     async openNote(path: string, filename: string, placement: NotePlacement, active:boolean=true) {
-        const folder:TFolder = this.getFolders().find(folder => folder.path === path) || app.vault.getRoot();
+        const folder:TFolder = this.getFolders().find(folder => folder.path === path) || await app.vault.createFolder(path);
         const fullFilePath = normalizePath(path + "/" + filename + ".md");
 
         let file = app.vault.getAbstractFileByPath(fullFilePath) as TFile;
