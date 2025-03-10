@@ -313,6 +313,7 @@ export default class RapidNotes extends Plugin {
             ({ folderPath, filename } = this.checkPrefix(filename));
         }
         folderPath = this.resolvePlaceholderValues(folderPath);
+        filename = this.resolvePlaceholderValues(filename);
         if (!folderPath) {
             let folders:TFolder[] = this.getFolders();
             const activeFile:TFile|null = app.workspace.getActiveFile();
