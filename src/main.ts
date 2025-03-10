@@ -511,7 +511,7 @@ class RapidNotesSettingsTab extends PluginSettingTab {
                 el.appendText("Keyword that will trigger the action (single words, case sensitive).");
                 el.createEl("br");
                 el.createEl("b", {text: "Real prefix (optional): "});
-                el.appendText("Text that will be prepended to the filename.");
+                el.appendText("Text that will be prepended to the filename. Can use placeholders such as {{date:YYYY-MM-DD}} (Moment.js formatting).");
                 el.createEl("br");
                 el.createEl("b", {text: "Folder: "});
                 el.appendText("Location for the saved note. Can use placeholders such as {{date:YYYY-MM-DD}} (Moment.js formatting).");
