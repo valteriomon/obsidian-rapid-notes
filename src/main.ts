@@ -55,6 +55,15 @@ const DEFAULT_SETTINGS = {
     realPrefixSeparator: " "
 };
 
+const PLACEHOLDER_RESOLVERS = [
+    (string: string) => string.replace(
+        /\{\{date:([^\}]+)\}\}/gi,
+        (_, format) => {
+            return window.moment().format(format);
+        }
+    )
+];
+
 export default class RapidNotes extends Plugin {
     settings: RapidNotesSettings;
 
@@ -287,6 +296,13 @@ export default class RapidNotes extends Plugin {
         }
     }
 
+    resolvePlaceholderValues(string: string): string {
+        return PLACEHOLDER_RESOLVERS.reduce(
+            (resolved, resolver) => resolver(resolved),
+            string
+        );
+    }
+
     async parseFilename(filename: string) {
         var folderPath = "";
         const escapeSymbol = this.settings.escapeSymbol || "/";
@@ -296,6 +312,7 @@ export default class RapidNotes extends Plugin {
         } else {
             ({ folderPath, filename } = this.checkPrefix(filename));
         }
+        folderPath = this.resolvePlaceholderValues(folderPath);
         if (!folderPath) {
             let folders:TFolder[] = this.getFolders();
             const activeFile:TFile|null = app.workspace.getActiveFile();
@@ -496,7 +513,7 @@ class RapidNotesSettingsTab extends PluginSettingTab {
                 el.appendText("Text that will be prepended to the filename.");
                 el.createEl("br");
                 el.createEl("b", {text: "Folder: "});
-                el.appendText("Location for the saved note.");
+                el.appendText("Location for the saved note. Can use placeholders such as {{date:YYYY-MM-DD}} (Moment.js formatting).");
                 el.createEl("br");
                 el.createEl("b", {text: "Toggle: "});
                 el.appendText("Create a command to save directly into the folder.");
