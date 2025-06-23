@@ -55,6 +55,15 @@ const DEFAULT_SETTINGS = {
     realPrefixSeparator: " "
 };
 
+const PLACEHOLDER_RESOLVERS = [
+    (string: string) => string.replace(
+        /\{\{date:([^\}]+)\}\}/gi,
+        (_, format) => {
+            return window.moment().format(format);
+        }
+    )
+];
+
 export default class RapidNotes extends Plugin {
     settings: RapidNotesSettings;
 
@@ -249,7 +258,7 @@ export default class RapidNotes extends Plugin {
             showSuggestions = false;
         }
         if(showSuggestions) {
-            modalSuggestions = this.settings.prefixedFolders.map((item)=>{ return {"command": item.prefix, "purpose": item.folder } });
+            modalSuggestions = this.settings.prefixedFolders.map((item)=>{ return {"command": item.prefix, "purpose": this.resolvePlaceholderValues(item.folder) } });
         }
         const escapeSymbol = this.settings.escapeSymbol || "/";
         const prompt = new PromptModal(placeholder, "rapid-notes-modal", escapeSymbol, modalSuggestions);
@@ -287,6 +296,13 @@ export default class RapidNotes extends Plugin {
         }
     }
 
+    resolvePlaceholderValues(string: string): string {
+        return PLACEHOLDER_RESOLVERS.reduce(
+            (resolved, resolver) => resolver(resolved),
+            string
+        );
+    }
+
     async parseFilename(filename: string) {
         var folderPath = "";
         const escapeSymbol = this.settings.escapeSymbol || "/";
@@ -296,6 +312,8 @@ export default class RapidNotes extends Plugin {
         } else {
             ({ folderPath, filename } = this.checkPrefix(filename));
         }
+        folderPath = this.resolvePlaceholderValues(folderPath);
+        filename = this.resolvePlaceholderValues(filename);
         if (!folderPath) {
             let folders:TFolder[] = this.getFolders();
             const activeFile:TFile|null = app.workspace.getActiveFile();
@@ -314,7 +332,7 @@ export default class RapidNotes extends Plugin {
     }
 
     async openNote(path: string, filename: string, placement: NotePlacement, active:boolean=true) {
-        const folder:TFolder = this.getFolders().find(folder => folder.path === path) || app.vault.getRoot();
+        const folder:TFolder = this.getFolders().find(folder => folder.path === path) || await app.vault.createFolder(path);
         const fullFilePath = normalizePath(path + "/" + filename + ".md");
 
         let file = app.vault.getAbstractFileByPath(fullFilePath) as TFile;
@@ -493,10 +511,10 @@ class RapidNotesSettingsTab extends PluginSettingTab {
                 el.appendText("Keyword that will trigger the action (single words, case sensitive).");
                 el.createEl("br");
                 el.createEl("b", {text: "Real prefix (optional): "});
-                el.appendText("Text that will be prepended to the filename.");
+                el.appendText("Text that will be prepended to the filename. Can use placeholders such as {{date:YYYY-MM-DD}} (Moment.js formatting).");
                 el.createEl("br");
                 el.createEl("b", {text: "Folder: "});
-                el.appendText("Location for the saved note.");
+                el.appendText("Location for the saved note. Can use placeholders such as {{date:YYYY-MM-DD}} (Moment.js formatting).");
                 el.createEl("br");
                 el.createEl("b", {text: "Toggle: "});
                 el.appendText("Create a command to save directly into the folder.");

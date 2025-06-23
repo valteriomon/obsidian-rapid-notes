@@ -15,6 +15,11 @@ declare module "obsidian" {
             filename: string
         ) => Promise<TFile>;
     }
+
+    interface Vault {
+        createFolder(path: string): Promise<TFolder>;
+        getFolderByPath(path: string): TFolder | null;
+    }
 }
 
 export {};
