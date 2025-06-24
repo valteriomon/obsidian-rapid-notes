@@ -1,4 +1,5 @@
 import {
+    App,
     Modal,
     Instruction,
 } from "obsidian";
@@ -12,6 +13,7 @@ export class PromptModal extends Modal {
     inputListener: EventListener;
 
     constructor(
+        app: App,
         private placeholder: string,
         private promptClass: string,
         private escapeSymbol: string,
