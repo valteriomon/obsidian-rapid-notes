@@ -316,8 +316,8 @@ export default class RapidNotes extends Plugin {
         filename = this.resolvePlaceholderValues(filename);
         if (!folderPath) {
             let folders:TFolder[] = this.getFolders();
-            const activeFile:TFile|null = app.workspace.getActiveFile();
-            const preferredFolder:TFolder = app.fileManager.getNewFileParent(activeFile?.path || "");
+            const activeFile:TFile|null = this.app.workspace.getActiveFile();
+            const preferredFolder:TFolder = this.app.fileManager.getNewFileParent(activeFile?.path || "");
 
             folders = folders.filter((folder) => folder.path !== preferredFolder.path);
             folders.unshift(preferredFolder);
@@ -332,10 +332,10 @@ export default class RapidNotes extends Plugin {
     }
 
     async openNote(path: string, filename: string, placement: NotePlacement, active:boolean=true) {
-        const folder:TFolder = this.getFolders().find(folder => folder.path === path) || await app.vault.createFolder(path);
+        const folder:TFolder = this.getFolders().find(folder => folder.path === path) || await this.app.vault.createFolder(path);
         const fullFilePath = normalizePath(path + "/" + filename + ".md");
 
-        let file = app.vault.getAbstractFileByPath(fullFilePath) as TFile;
+        let file = this.app.vault.getAbstractFileByPath(fullFilePath) as TFile;
         if (file instanceof TFolder) {
             new Notice(`${fullFilePath} found but it's a folder`);
             return;
@@ -344,9 +344,9 @@ export default class RapidNotes extends Plugin {
             if(this.settings.capitalizeFilename) {
                 filename = filename.split('/').map(substring => substring.charAt(0).toUpperCase() + substring.slice(1)).join('/');
             }
-            file = await app.fileManager.createNewMarkdownFile(folder, filename);
+            file = await this.app.fileManager.createNewMarkdownFile(folder, filename);
         }
-        app.workspace.getLeaf(placement || false).openFile(file, {
+        this.app.workspace.getLeaf(placement || false).openFile(file, {
             state: { mode: "source" },
             active: active
         });
@@ -359,7 +359,7 @@ export default class RapidNotes extends Plugin {
 
     getFolders(): TFolder[] {
         const folders: Set<TFolder> = new Set();
-        Vault.recurseChildren(app.vault.getRoot(), (file) => {
+        Vault.recurseChildren(this.app.vault.getRoot(), (file) => {
             if (file instanceof TFolder) {
                 folders.add(file);
             }
@@ -374,7 +374,7 @@ export default class RapidNotes extends Plugin {
             const {folderPath, filename} = await this.parseFilename(selectionFilename);
             const file = await this.openNote(folderPath, filename, notePlacement, active);
             if(file instanceof TFile) {
-                const replaceText = app.fileManager.generateMarkdownLink(file, "", "", alias || filename);
+                const replaceText = this.app.fileManager.generateMarkdownLink(file, "", "", alias || filename);
                 editor.replaceSelection(replaceText);
             }
 
@@ -387,7 +387,7 @@ export default class RapidNotes extends Plugin {
                 const {folderPath, filename} = await this.parseFilename(match.filename);
                 const file = await this.openNote(folderPath, filename, notePlacement, active);
                 if(file instanceof TFile) {
-                    const replaceText = app.fileManager.generateMarkdownLink(file, "", "", match.alias || filename);
+                    const replaceText = this.app.fileManager.generateMarkdownLink(file, "", "", match.alias || filename);
                     // Replace text in editor
                     const editorPositionStart: EditorPosition = {
                         line: range.line,
