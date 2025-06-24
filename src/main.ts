@@ -261,8 +261,8 @@ export default class RapidNotes extends Plugin {
             modalSuggestions = this.settings.prefixedFolders.map((item)=>{ return {"command": item.prefix, "purpose": this.resolvePlaceholderValues(item.folder) } });
         }
         const escapeSymbol = this.settings.escapeSymbol || "/";
-        const prompt = new PromptModal(placeholder, "rapid-notes-modal", escapeSymbol, modalSuggestions);
-        let promptValue: string = await new Promise((resolve) => prompt.openAndGetValue((resolve), ()=>{}));
+        const prompt = new PromptModal(this.app, placeholder, "rapid-notes-modal", escapeSymbol, modalSuggestions);
+        const promptValue: string = await new Promise((resolve) => prompt.openAndGetValue((resolve), ()=>{}));
         return promptValue.trim();
     }
 
@@ -322,7 +322,7 @@ export default class RapidNotes extends Plugin {
             folders = folders.filter((folder) => folder.path !== preferredFolder.path);
             folders.unshift(preferredFolder);
             const folderPaths = folders.map((folder) => folder.path);
-            const suggester = new SuggesterModal(folderPaths, folderPaths, "Choose folder");
+            const suggester = new SuggesterModal(this.app, folderPaths, folderPaths, "Choose folder");
             folderPath = await new Promise((resolve) => suggester.openAndGetValue(resolve, ()=>{}));
         }
         return {
@@ -571,7 +571,7 @@ class RapidNotesSettingsTab extends PluginSettingTab {
                     });
                 })
                 .addSearch((cb) => {
-                    new FolderSuggest(cb.inputEl);
+                    new FolderSuggest(this.app, cb.inputEl);
                     cb
                     .setPlaceholder("Folder")
                     .setValue(prefixedFolder.folder)
